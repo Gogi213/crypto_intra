@@ -2,8 +2,7 @@ from pulsar import Client
 import websocket
 import json
 import pandas as pd
-from bd import connect_to_db, update_or_insert_trade_pairs  # Add update_or_insert_trade_pairs to the import statement
-
+from bd import connect_to_db, update_or_insert_trade_pairs
 
 
 # Инициализация клиента Pulsar
@@ -44,16 +43,18 @@ def on_message(ws, message):
             # Convert dictionary back to JSON string
             filtered_message = json.dumps(filtered_data)
 
-            # Convert message to bytes and publish to Pulsar
-            producer.send(bytes(filtered_message, 'utf-8'))
+            # Try to send the message
+            try:
+                # Convert message to bytes and publish to Pulsar
+                producer.send(bytes(filtered_message, 'utf-8'))
+            except:
+                print('Pulsar producer is closed. Attempting to reconnect.')
+                reconnect_pulsar()
 
             # Update the values in the database
             df = pd.DataFrame([filtered_data])
             engine = connect_to_db(database='crypto_intra')
-            update_or_insert_trade_pairs(engine, df)  # Replace update_table with update_or_insert_trade_pairs
-
-
-
+            update_or_insert_trade_pairs(engine, df)
 
 
 def on_error(ws, error):
@@ -64,6 +65,17 @@ def on_close(ws, close_status_code, close_msg):
     # Закрытие продюсера и клиента Pulsar
     producer.close()
     client.close()
+
+# Connection management functions
+
+def reconnect_pulsar():
+    global client, producer
+    try:
+        client.close()
+    except Exception as e:
+        print(f'Error closing Pulsar client: {e}')
+    client = Client('pulsar://localhost:6650')
+    producer = client.create_producer('binance')
 
 # Подключение к WebSocket API Binance
 ws = websocket.WebSocketApp(
