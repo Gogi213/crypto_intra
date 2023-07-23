@@ -7,20 +7,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:19938713@localhost
 db = SQLAlchemy(app)
 
 class BinanceData(db.Model):
-    __tablename__ = 'binance_bundles'
-    id = db.Column(db.Integer, primary_key=True)
-    symbol = db.Column(db.String(50))
-    base = db.Column(db.String(50))
-    quote = db.Column(db.String(50))
-    swap = db.Column(db.String(50))
-    symbol2 = db.Column(db.String(50))
-    base2 = db.Column(db.String(50))
-    quote2 = db.Column(db.String(50))
-    swap2 = db.Column(db.String(50))
-    symbol3 = db.Column(db.String(50))
-    base3 = db.Column(db.String(50))
-    quote3 = db.Column(db.String(50))
-    swap3 = db.Column(db.String(50))
+    __tablename__ = 'binance_socket_prices'
+    symbol = db.Column(db.String(50), primary_key=True)
+    askprice = db.Column(db.Float)
+    askqty = db.Column(db.Float)
+    bidprice = db.Column(db.Float)
+    bidqty = db.Column(db.Float)
 
 @app.route('/')
 def home():

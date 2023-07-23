@@ -5,7 +5,7 @@ from binance_pulsar import ws
 from calculate_profit import calculate_triple_exchanges
 
 # Start the Binance subscription and Pulsar publication process
-ws.run_forever()
+# ws.run_forever()
 
 output_path = r'C:\Users\Redmi\PycharmProjects\crypto_intra\venv\all files\debug_df_data.csv'
 

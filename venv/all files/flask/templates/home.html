@@ -26,37 +26,21 @@
     <table id="myTable" class="display">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Symbol</th>
-                <th>Base</th>
-                <th>Quote</th>
-                <th>Swap</th>
-                <th>Symbol 2</th>
-                <th>Base 2</th>
-                <th>Quote 2</th>
-                <th>Swap 2</th>
-                <th>Symbol 3</th>
-                <th>Base 3</th>
-                <th>Quote 3</th>
-                <th>Swap 3</th>
+                <th>Ask Price</th>
+                <th>Ask Qty</th>
+                <th>Bid Price</th>
+                <th>Bid Qty</th>
             </tr>
         </thead>
         <tbody>
             {% for data in table1 %}
             <tr>
-                <td>{{ data.id }}</td>
                 <td>{{ data.symbol }}</td>
-                <td>{{ data.base }}</td>
-                <td>{{ data.quote }}</td>
-                <td>{{ data.swap }}</td>
-                <td>{{ data.symbol2 }}</td>
-                <td>{{ data.base2 }}</td>
-                <td>{{ data.quote2 }}</td>
-                <td>{{ data.swap2 }}</td>
-                <td>{{ data.symbol3 }}</td>
-                <td>{{ data.base3 }}</td>
-                <td>{{ data.quote3 }}</td>
-                <td>{{ data.swap3 }}</td>
+                <td>{{ data.askprice }}</td>
+                <td>{{ data.askqty }}</td>
+                <td>{{ data.bidprice }}</td>
+                <td>{{ data.bidqty }}</td>
             </tr>
             {% endfor %}
         </tbody>
