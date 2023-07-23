@@ -2,17 +2,17 @@ from pulsar import Client
 import websocket
 import json
 
-# Initialize Pulsar client
+# Инициализация клиента Pulsar
 client = Client('pulsar://localhost:6650')
 
-# Initialize Pulsar producer
+# Инициализация продюсера Pulsar
 producer = client.create_producer('binance')
 
-# Define WebSocket callback functions
+# Определение функций обратного вызова WebSocket
 
 def on_open(ws):
-    print('WebSocket connection opened.')
-    # Subscribe to all trading pairs
+    print('Соединение с WebSocket открыто.')
+    # Подписка на все торговые пары
     ws.send(json.dumps({
         'method': 'SUBSCRIBE',
         'params': ['!ticker@arr'],
@@ -20,19 +20,33 @@ def on_open(ws):
     }))
 
 def on_message(ws, message):
-    # Convert message to bytes and publish to Pulsar
-    producer.send(bytes(message, 'utf-8'))
+    # Convert message to list of Python dictionaries
+    data_list = json.loads(message)
+
+    for data in data_list:
+        # Keep only the necessary columns
+        filtered_data = {key: data[key] for key in ('s', 'a', 'A', 'b', 'B') if key in data}
+
+        # Print filtered data to console
+        print(filtered_data)
+
+        # Convert dictionary back to JSON string
+        filtered_message = json.dumps(filtered_data)
+
+        # Convert message to bytes and publish to Pulsar
+        producer.send(bytes(filtered_message, 'utf-8'))
+
 
 def on_error(ws, error):
-    print(f'WebSocket error: {error}')
+    print(f'Ошибка WebSocket: {error}')
 
 def on_close(ws):
-    print('WebSocket connection closed.')
-    # Close Pulsar producer and client
+    print('Соединение с WebSocket закрыто.')
+    # Закрытие продюсера и клиента Pulsar
     producer.close()
     client.close()
 
-# Connect to Binance WebSocket API
+# Подключение к WebSocket API Binance
 ws = websocket.WebSocketApp(
     'wss://stream.binance.com:9443/ws',
     on_open=on_open,
