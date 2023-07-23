@@ -2,7 +2,8 @@ from pulsar import Client
 import websocket
 import json
 import pandas as pd
-from bd import connect_to_db, update_table
+from bd import connect_to_db, update_or_insert_trade_pairs  # Add update_or_insert_trade_pairs to the import statement
+
 
 
 # Инициализация клиента Pulsar
@@ -28,8 +29,14 @@ def on_message(ws, message):
 
     for data in data_list:
         if isinstance(data, dict):
-            # Keep only the necessary columns
-            filtered_data = {key: data[key] for key in ('s', 'a', 'A', 'b', 'B') if key in data}
+            # Keep only the necessary columns and rename them
+            filtered_data = {
+                'symbol': data['s'],
+                'askprice': data['a'],
+                'askqty': data['A'],
+                'bidprice': data['b'],
+                'bidqty': data['B']
+            }
 
             # Print filtered data to console
             print(filtered_data)
@@ -42,7 +49,10 @@ def on_message(ws, message):
 
             # Update the values in the database
             df = pd.DataFrame([filtered_data])
-            engine = connect_to_db()
+            engine = connect_to_db(database='crypto_intra')
+            update_or_insert_trade_pairs(engine, df)  # Replace update_table with update_or_insert_trade_pairs
+
+
 
 
 
