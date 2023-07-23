@@ -1,10 +1,13 @@
-# app.py
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO, emit
+from threading import Thread
+import time
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:19938713@localhost:3306/crypto_intra'
 db = SQLAlchemy(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 class BinanceData(db.Model):
     __tablename__ = 'binance_socket_prices'
@@ -14,10 +17,30 @@ class BinanceData(db.Model):
     bidprice = db.Column(db.Float)
     bidqty = db.Column(db.Float)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 @app.route('/')
 def home():
     table1 = BinanceData.query.all()
     return render_template('home.html', table1=table1)
 
+@socketio.on('connect')
+def test_connect():
+    emit('binance update', {'data': 'Connected'})
+
+@socketio.on('request update')
+def update():
+    table1 = [row.to_dict() for row in BinanceData.query.all()]
+    emit('binance update', {'data': table1})
+
+def background_thread():
+    with app.app_context():
+        while True:
+            socketio.sleep(0.5)
+            table1 = [row.to_dict() for row in BinanceData.query.all()]
+            socketio.emit('binance update', {'data': table1})
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.start_background_task(background_thread)
+    socketio.run(app)

@@ -29,6 +29,7 @@ def on_message(ws, message):
     data_list = json.loads(message)
 
     for data in data_list:
+        print(data)
         if isinstance(data, dict):
             # Keep only the necessary columns and rename them
             filtered_data = {
@@ -40,7 +41,7 @@ def on_message(ws, message):
             }
 
             # Print filtered data to console
-            print(filtered_data)
+            # print(filtered_data)
 
             # Convert dictionary back to JSON string
             filtered_message = json.dumps(filtered_data)

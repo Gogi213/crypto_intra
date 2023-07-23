@@ -1,58 +1,64 @@
-<!--home.html-->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Table 1</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
     <style>
-        #myTable {
-            margin-top: 50px;
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
+        #binanceTable {
+            margin: 50px auto;
+            width: 80% !important;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
-        }
-        th, td {
-            padding: 15px;
-            text-align: left;
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
         }
     </style>
 </head>
 <body>
-<h1>Table 1</h1>
-<div style="width: 50%; margin: 0 auto;">
-    <table id="myTable" class="display">
+    <table id="binanceTable" class="display">
         <thead>
             <tr>
                 <th>Symbol</th>
                 <th>Ask Price</th>
-                <th>Ask Qty</th>
+                <th>Ask Quantity</th>
                 <th>Bid Price</th>
-                <th>Bid Qty</th>
+                <th>Bid Quantity</th>
             </tr>
         </thead>
         <tbody>
-            {% for data in table1 %}
-            <tr>
-                <td>{{ data.symbol }}</td>
-                <td>{{ data.askprice }}</td>
-                <td>{{ data.askqty }}</td>
-                <td>{{ data.bidprice }}</td>
-                <td>{{ data.bidqty }}</td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('#myTable').DataTable();
-} );
-</script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var table = $('#binanceTable').DataTable();
+
+        socket.on('connect', function() {
+            socket.emit('request update');
+        });
+
+        socket.on('binance update', function(msg) {
+            table.clear();
+            for (var i = 0; i < msg.data.length; i++) {
+                var row = msg.data[i];
+                // Make sure all fields are defined before using them
+                table.row.add([
+                    row.symbol || '',
+                    row.askprice || '',
+                    row.askqty || '',
+                    row.bidprice || '',
+                    row.bidqty || ''
+                ]);
+            }
+            table.draw();
+        });
+
+        setInterval(function() {
+            socket.emit('request update');
+        }, 1000);
+    </script>
 </body>
 </html>
