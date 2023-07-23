@@ -1,3 +1,4 @@
+# bd_case.py
 from sqlalchemy import create_engine, Column, String, Float
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
