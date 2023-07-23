@@ -1,6 +1,9 @@
 from pulsar import Client
 import websocket
 import json
+import pandas as pd
+from bd import connect_to_db, update_table
+
 
 # Инициализация клиента Pulsar
 client = Client('pulsar://localhost:6650')
@@ -24,24 +27,30 @@ def on_message(ws, message):
     data_list = json.loads(message)
 
     for data in data_list:
-        # Keep only the necessary columns
-        filtered_data = {key: data[key] for key in ('s', 'a', 'A', 'b', 'B') if key in data}
+        if isinstance(data, dict):
+            # Keep only the necessary columns
+            filtered_data = {key: data[key] for key in ('s', 'a', 'A', 'b', 'B') if key in data}
 
-        # Print filtered data to console
-        print(filtered_data)
+            # Print filtered data to console
+            print(filtered_data)
 
-        # Convert dictionary back to JSON string
-        filtered_message = json.dumps(filtered_data)
+            # Convert dictionary back to JSON string
+            filtered_message = json.dumps(filtered_data)
 
-        # Convert message to bytes and publish to Pulsar
-        producer.send(bytes(filtered_message, 'utf-8'))
+            # Convert message to bytes and publish to Pulsar
+            producer.send(bytes(filtered_message, 'utf-8'))
+
+            # Update the values in the database
+            df = pd.DataFrame([filtered_data])
+            engine = connect_to_db()
+
 
 
 def on_error(ws, error):
     print(f'Ошибка WebSocket: {error}')
 
-def on_close(ws):
-    print('Соединение с WebSocket закрыто.')
+def on_close(ws, close_status_code, close_msg):
+    print("### closed ###")
     # Закрытие продюсера и клиента Pulsar
     producer.close()
     client.close()
