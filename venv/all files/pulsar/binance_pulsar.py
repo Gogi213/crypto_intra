@@ -1,10 +1,11 @@
+# binance_pulsar.py
 from pulsar import Client
 import websocket
 import json
 import pandas as pd
 import sys
 sys.path.append('C:/Users/Redmi/PycharmProjects/crypto_intra/venv/all files')
-from bd import connect_to_db, update_or_insert_trade_pairs
+from bd_case import connect_to_db, update_or_insert_trade_pairs
 
 
 # Инициализация клиента Pulsar

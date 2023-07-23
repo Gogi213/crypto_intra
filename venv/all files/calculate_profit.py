@@ -1,9 +1,9 @@
-# calculate_profi.py
+# calculate_profit.py
 import binance_api
 import data_processing
 import itertools
 import pandas as pd
-from bd import connect_to_db, update_table
+from bd_case import connect_to_db, update_table
 
 def calculate_triple_exchanges(output_path):
     data = binance_api.get_binance_data()
