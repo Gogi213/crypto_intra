@@ -34,11 +34,14 @@ def update_or_insert_trade_pairs(engine, df):
         if trade_pair is None:
             # If the trade pair does not exist in the table, create a new one
             trade_pair = TradePair(symbol=row['symbol'])
+            session.add(trade_pair)
         # Update the trade pair with the new data
-        trade_pair.ask_price = row['askprice']
-        trade_pair.ask_quantity = row['askqty']
-        trade_pair.bid_price = row['bidprice']
-        trade_pair.bid_quantity = row['bidqty']
-        session.merge(trade_pair)
+        session.query(TradePair).filter_by(symbol=row['symbol']).update({
+            'askprice': row['askprice'],
+            'askqty': row['askqty'],
+            'bidprice': row['bidprice'],
+            'bidqty': row['bidqty']
+        })
 
     session.commit()
+
