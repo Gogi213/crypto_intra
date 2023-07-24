@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
@@ -37,7 +38,7 @@ def update():
 def background_thread():
     with app.app_context():
         while True:
-            socketio.sleep(0.5)
+            socketio.sleep(1)
             table1 = [row.to_dict() for row in BinanceData.query.all()]
             socketio.emit('binance update', {'data': table1})
 
