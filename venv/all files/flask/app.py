@@ -38,9 +38,18 @@ def update():
 def background_thread():
     with app.app_context():
         while True:
-            socketio.sleep(1)
+            socketio.sleep(100)
             table1 = [row.to_dict() for row in BinanceData.query.all()]
             socketio.emit('binance update', {'data': table1})
+
+@app.after_request
+def add_header(response):
+    response.cache_control.no_store = True
+    response.cache_control.no_cache = True
+    response.cache_control.must_revalidate = True
+    response.cache_control.proxy_revalidate = True
+    response.cache_control.max_age = 0
+    return response
 
 if __name__ == '__main__':
     socketio.start_background_task(background_thread)

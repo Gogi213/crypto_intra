@@ -59,10 +59,12 @@ def on_message(ws, message):
 
         # Update the values in the database
         df = pd.DataFrame([filtered_data])
+        print(df)  # <--- Add this line to print the dataframe
         engine = connect_to_db(database='crypto_intra')
         update_or_insert_trade_pairs(engine, df)
     else:
         print(f'Unexpected message: {data}')
+
 
 def on_error(ws, error):
     print(f'Ошибка WebSocket: {error}')
