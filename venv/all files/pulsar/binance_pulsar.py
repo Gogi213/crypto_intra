@@ -7,7 +7,7 @@ from bd_case import connect_to_db, update_or_insert_trade_pairs
 from pulsar import Client
 
 # List of currency pairs
-currency_pairs = ['ethusdt', 'btcusdt']
+currency_pairs = ['btcusdt', 'qtumeth', 'eoseth', 'snteth', 'bnteth', 'bnbeth', 'lrceth', 'funeth', 'neoeth', 'iotaeth', 'linketh', 'xvgeth', 'mtleth', 'etceth', 'zeceth', 'dasheth', 'trxeth', 'powreth', 'xrpeth', 'enjeth', 'xmreth', 'bateth', 'neobnb', 'lsketh', 'manaeth', 'iotabnb', 'adxeth', 'adaeth', 'xlmeth', 'xlmbnb', 'ltceth', 'ltcbnb', 'waveseth', 'elfeth', 'rlceth', 'iosteth', 'steemeth', 'zileth', 'zilbnb', 'waneth', 'adabnb', 'ethtusd', 'zeneth', 'eosbnb', 'thetaeth', 'thetabnb', 'xrpbnb', 'iotxeth', 'qkceth', 'trxbnb', 'etcbnb', 'sceth', 'denteth', 'hoteth', 'veteth', 'vetbnb', 'bnbtusd', 'xrptusd', 'bnbusdc', 'ethusdc', 'adatusd', 'trxxrp', 'ltctusd', 'fetbnb', 'xmrbnb', 'celrbnb', 'maticbnb', 'atombnb', 'onebnb', 'ftmbnb', 'algobnb', 'ankrbnb', 'winbnb', 'cosbnb', 'wintrx', 'chzbnb', 'bnbbusd', 'hbarbnb', 'xrpbusd', 'ethbusd', 'ltcbusd', 'linkbusd', 'etcbusd', 'stxbnb', 'kavabnb', 'arpabnb', 'trxbusd', 'eosbusd', 'xlmbusd', 'adabusd', 'bchbnb', 'bchtusd', 'bchbusd', 'ethrub', 'xrprub', 'bnbrub', 'busdrub', 'qtumbusd', 'vetbusd']  # Add more pairs as needed
 
 # WebSocket connections dictionary
 ws_connections = {}
