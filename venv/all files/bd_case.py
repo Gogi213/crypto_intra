@@ -2,6 +2,7 @@
 from sqlalchemy import create_engine, Column, String, Float
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.pool import QueuePool
 import pandas as pd
 import numpy as np
 
@@ -16,7 +17,11 @@ class TradePair(Base):
     bidqty = Column(Float)
 
 def connect_to_db(database='crypto_intra', user='root', password='19938713', host='localhost', port='3306'):
-    engine = create_engine(f'mysql+pymysql://{user}:{password}@{host}:{port}/{database}')
+    engine = create_engine(f'mysql+pymysql://{user}:{password}@{host}:{port}/{database}',
+                           poolclass=QueuePool,
+                           pool_size=10,  # Adjust as needed
+                           max_overflow=20  # Adjust as needed
+                           )
     return engine
 
 def update_table(engine, df, table_name):
