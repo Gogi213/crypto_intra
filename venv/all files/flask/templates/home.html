@@ -1,4 +1,3 @@
-<!--home.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,24 +41,29 @@
         });
 
         socket.on('binance update', function(msg) {
-            table.clear();
-            for (var i = 0; i < msg.data.length; i++) {
-                var row = msg.data[i];
-                // Make sure all fields are defined before using them
-                table.row.add([
-                    row.symbol || '',
-                    row.askprice || '',
-                    row.askqty || '',
-                    row.bidprice || '',
-                    row.bidqty || ''
-                ]);
-            }
-            table.draw();
-        });
+            var data = msg.data;
+            var symbol = data.symbol.toLowerCase();
+            var row = table.row('#' + symbol);
 
-        setInterval(function() {
-            socket.emit('request update');
-        }, 1000);
+            if (!row.length) {
+                table.row.add({
+                    "DT_RowId": symbol,
+                    "0": data.symbol,
+                    "1": data.askprice,
+                    "2": data.askqty,
+                    "3": data.bidprice,
+                    "4": data.bidqty
+                }).draw();
+            } else {
+                row.data([
+                    data.symbol,
+                    data.askprice,
+                    data.askqty,
+                    data.bidprice,
+                    data.bidqty
+                ]).draw();
+            }
+        });
     </script>
 </body>
 </html>
