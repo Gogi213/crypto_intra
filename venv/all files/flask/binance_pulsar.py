@@ -1,22 +1,21 @@
+import yappi
 import asyncio
 import websockets
 import json
+import threading
 from flask_socketio import emit
-
-# Импортируем socketio из app.py
 from app import socketio
+import aiohttp
 
-# List of currency pairs
-# Replace these with your actual pairs
-pairs1 = ['1inchbtc','1inchbusd','1inchusdt','aavebnb','aavebtc']
-pairs2 = ['alpineusdt','ambbusd','ambusdt','ampbusd','ampusdt']
-pairs3 = ['atomusdt','auctionbtc','auctionbusd','auctionusdt','audiotry']
-pairs4 = ['bnbeur','bnbfdusd','bnbgbp','bnbtry','bnbtusd']
-pairs5 = ['celobtc','celobusd','celousdt','celrbusd','celrusdt']
+# Вставьте свой API ключ здесь
+API_KEY = 'jByRuDyDvM3bQl71hLgadWt932jodjvpJRqvXsQRIWHfpSZwxYBR7BWFBOXO7o6b'
 
-pairs_list = [pairs1, pairs2, pairs3, pairs4, pairs5]
+pairs1 = ['1inchbtc', '1inchbusd', '1inchusdt', 'aavebnb', 'aavebtc', 'aavebusd', 'aaveusdt', 'acabtc', 'acabusd', 'acatry', 'acausdt', 'achbtc', 'achbusd', 'achtry', 'achusdt', 'acmbusd', 'acmusdt', 'adabnb', 'adabrl', 'adabtc', 'adabusd', 'adaeth', 'adaeur', 'adatry', 'adausdt', 'adadownusdt']
+pairs2 = ['alpineusdt', 'ambbusd', 'ambusdt', 'ampbusd', 'ampusdt', 'ankrbtc', 'ankrbusd', 'ankrtry', 'ankrusdt', 'antusdt', 'apebtc', 'apebusd', 'apetry', 'apeusdt', 'api3usdt', 'aptbtc', 'aptbusd', 'apttry', 'aptusdt', 'arbtc', 'arusdt', 'arbbtc', 'arbeth', 'arbtry', 'arbtusd', 'arbusdt']
+pairs3 = ['atomusdt', 'auctionbtc', 'auctionbusd', 'auctionusdt', 'audiotry', 'audiousdt', 'avabtc', 'avausdt', 'avaxbnb', 'avaxbtc', 'avaxbusd', 'avaxeth', 'avaxeur', 'avaxtry', 'avaxusdt', 'axsbtc', 'axsbusd', 'axsusdt', 'badgerusdt', 'bakebusd', 'bakeusdt', 'balusdt', 'bandbusd']
 
-# Data storage
+pairs_list = [pairs1, pairs2, pairs3]
+
 data = {pair: {} for sublist in pairs_list for pair in sublist}
 
 @socketio.on('request update')
@@ -26,7 +25,7 @@ def update():
 
 async def connect_to_websocket(chunk):
     uri = 'wss://stream.binance.com:9443/stream'
-    async with websockets.connect(uri) as ws:
+    async with websockets.connect(uri, extra_headers={'X-MBX-APIKEY': API_KEY}) as ws:
         params = {
             'method': 'SUBSCRIBE',
             'params': [f'{pair}@bookTicker' for pair in chunk],
@@ -38,13 +37,8 @@ async def connect_to_websocket(chunk):
             message = await ws.recv()
             print(f'Raw message: {message}')
 
-            # Parse the message
             msg = json.loads(message)
 
-            # Check if 'data' is in the message
             if 'data' in msg and 's' in msg['data']:
-                # Update the data
                 data[msg['data']['s'].lower()] = {'symbol': msg['data']['s'], 'askprice': msg['data']['a'], 'askqty': msg['data']['A'], 'bidprice': msg['data']['b'], 'bidqty': msg['data']['B']}
-
-                # Send the data to the web page
                 socketio.emit('binance update', {'data': data[msg['data']['s'].lower()]})
